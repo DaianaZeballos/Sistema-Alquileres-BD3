@@ -73,3 +73,20 @@ C. Colección: Contratos
 ```
 
 Decisión Arquitectónica: El contrato utiliza referencias para apuntar al inmueble y al inquilino. Sin embargo, las condiciones específicas del aumento y los pagos mensuales se anidan dentro del contrato para garantizar una consulta eficiente del historial financiero en un solo paso.
+
+D. Colección: Propietarios
+```json
+{
+  "_id": "prop_888",
+  "nombre": "Roberto Sánchez",
+  "cuit": "20-12345678-9",
+  "telefonos": ["261-4443333"],
+  "email": "roberto.sanchez@email.com",
+  "datos_bancarios": {
+    "banco": "Banco Galicia",
+    "cbu": "0070000000000000000000",
+    "alias": "ROBERTO.CASA.ALQUILER"
+  }
+  ```
+  Decisión Arquitectónica: Los datos bancarios y de contacto se modelan de forma anidada dentro del perfil del propietario. Esto se debe a que la administradora necesita leer esta información en conjunto cada vez que realiza la liquidación mensual de los alquileres. Además, mantener a los propietarios en una colección separada permite utilizar referencias desde la colección Inmuebles, lo cual es vital porque un mismo dueño puede tener múltiples propiedades. Así se evita la redundancia de datos y se asegura la consistencia si el propietario cambia su cuenta bancaria.
+}
