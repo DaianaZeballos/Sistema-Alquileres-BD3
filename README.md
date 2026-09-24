@@ -90,3 +90,20 @@ D. Colección: Propietarios
   ```
   Decisión Arquitectónica: Los datos bancarios y de contacto se modelan de forma anidada dentro del perfil del propietario. Esto se debe a que la administradora necesita leer esta información en conjunto cada vez que realiza la liquidación mensual de los alquileres. Además, mantener a los propietarios en una colección separada permite utilizar referencias desde la colección Inmuebles, lo cual es vital porque un mismo dueño puede tener múltiples propiedades. Así se evita la redundancia de datos y se asegura la consistencia si el propietario cambia su cuenta bancaria.
 }
+
+Fase 2: Consultas y Actualizaciones
+
+<img width="886" height="481" alt="image" src="https://github.com/user-attachments/assets/27d0afd3-c208-44cf-b9ab-90452956fb16" />
+
+<img width="878" height="591" alt="image" src="https://github.com/user-attachments/assets/047dcc5c-da7b-4bde-ada6-0ed2f37f496d" />
+<img width="931" height="577" alt="image" src="https://github.com/user-attachments/assets/1517f93d-7f8b-4d3f-91aa-f9df01b411d2" />
+
+<img width="946" height="553" alt="image" src="https://github.com/user-attachments/assets/b0717c45-038f-49a4-a3d5-6ade7af82b47" />
+
+<img width="934" height="562" alt="image" src="https://github.com/user-attachments/assets/62326b69-ba29-496f-a57d-3518cadb609c" />
+
+<img width="885" height="429" alt="image" src="https://github.com/user-attachments/assets/1a03f7ab-4dad-4aa2-9e03-23bafb4e3ac3" />
+
+<img width="896" height="325" alt="image" src="https://github.com/user-attachments/assets/52c428e8-711e-4a63-a12e-e5a5afdd2a8a" />
+
+<img width="885" height="214" alt="image" src="https://github.com/user-attachments/assets/636f3e46-e4bf-4d13-ac89-8cb49306a20a" />
