@@ -107,3 +107,67 @@ Fase 2: Consultas y Actualizaciones
 <img width="896" height="325" alt="image" src="https://github.com/user-attachments/assets/52c428e8-711e-4a63-a12e-e5a5afdd2a8a" />
 
 <img width="885" height="214" alt="image" src="https://github.com/user-attachments/assets/636f3e46-e4bf-4d13-ac89-8cb49306a20a" />
+
+
+Fase 3: Resiliencia, Transacciones y Securización (Proyecto Integrador Final)
+
+1. Diagrama de Arquitectura
+El sistema ha migrado de un entorno de desarrollo aislado a un clúster de Alta Disponibilidad (Replica Set) compuesto por tres nodos locales para garantizar la continuidad del negocio:
+
+**Nodo Primario** (Puerto 27021): Procesa todas las operaciones de lectura y escritura de la aplicación `SistemaAlquileres`.
+**Nodo Secundario** (Puerto 27022): Replica los datos del Primario en tiempo real para garantizar redundancia y resguardo de la información.
+**Nodo Árbitro** (Puerto 27023): No almacena datos de negocio, pero participa en las elecciones de topología para romper empates y promover al Secundario en caso de un fallo general.
+
+2. Bitácora del Failover (Tolerancia a Fallos)
+Para demostrar la resiliencia del clúster, se ejecutó un script de inserción continua, simulando una carga de trabajo en producción. Durante este proceso, se provocó la caída intencional del **Nodo Primario**.
+
+1. Fallo provocado: Se detuvo abruptamente el proceso del puerto 27021. El sistema arrojó temporalmente el error `MongoServerError[NotWritablePrimary]`, pausando las escrituras para evitar inconsistencias.
+2. Elección automática: El Nodo Árbitro detectó la ausencia del Primario y emitió su voto para promover al Nodo Secundario.
+3. Recuperación: En cuestión de segundos, el puerto 27022 asumió como nuevo Primario y el script continuó insertando datos automáticamente sin intervención manual.
+<img width="886" height="750" alt="image" src="https://github.com/user-attachments/assets/8b832ffe-d920-4647-a428-ef7b6d4f7c0e" />
+
+<img width="886" height="608" alt="image" src="https://github.com/user-attachments/assets/3185594b-fcd9-4f4c-b324-a2bfc67f2655" />
+
+   <img width="886" height="478" alt="image" src="https://github.com/user-attachments/assets/f62ab3f8-ae89-463c-9f3d-bb63e4bf10dd" />
+
+3. Transacciones ACID Multi-documento
+Se implementó una transacción crítica del dominio: **La creación de un nuevo contrato de alquiler**. Esta operación requiere atomicidad absoluta; si se crea el documento del contrato, el inmueble correspondiente debe actualizar su estado a "Alquilado". Si alguna de las dos operaciones falla, el sistema revierte los cambios (Rollback).
+
+Escenario de Éxito (Commit):
+La sesión inicia la transacción, inserta el contrato, actualiza el inmueble y confirma los cambios.
+
+Escenario de Fallo (Rollback):
+Se simuló un error de negocio (rechazo crediticio del inquilino) en el medio de la transacción. El motor detectó la excepción y ejecutó automáticamente un `abortTransaction()`, deshaciendo la creación del contrato y manteniendo la base de datos intacta.
+
+<img width="886" height="479" alt="image" src="https://github.com/user-attachments/assets/e85fd9af-5aeb-48de-b112-afbf03f3d542" />
+
+<img width="947" height="600" alt="image" src="https://github.com/user-attachments/assets/165e7f80-5be6-4421-97e3-9fc481d330cd" />
+
+<img width="857" height="534" alt="image" src="https://github.com/user-attachments/assets/423151ae-ba85-4ef7-9824-d72d2f944699" />
+
+<img width="886" height="551" alt="image" src="https://github.com/user-attachments/assets/ba8d2055-d1fa-4b69-86ef-18317b873018" />
+
+Cifrado de comunicación interna: Se habilitó el parámetro `--keyFile` con un archivo secreto (`clave.txt`). Esto obliga a los nodos del clúster a identificarse con una llave criptográfica compartida, evitando que servidores no autorizados se unan al Replica Set para robar datos.
+
+2. Control de Acceso Basado en Roles (RBAC): Se deshabilitó el acceso anónimo y se crearon perfiles bajo el estricto principio de mínimos privilegios:
+   **Administrador (rol: root):** Usuario maestro de acceso exclusivo para la configuración y mantenimiento.
+   **AppAlquileres (rol: readWrite):** Usuario restringido que la aplicación utilizará para conectarse, con permisos limitados únicamente a la base de datos `SistemaAlquileres`.
+
+   Evidencia de blindaje: El sistema ahora rechaza activamente cualquier intento de consulta no autenticada o anónima, arrojando un error de autorización antes de exponer cualquier colección.
+
+   <img width="794" height="671" alt="image" src="https://github.com/user-attachments/assets/66d15b65-3cd4-48cf-b232-1aa85f4bef7d" />
+
+<img width="886" height="791" alt="image" src="https://github.com/user-attachments/assets/1e07f5d9-1a0e-4d99-b194-25b42032b90b" />
+
+<img width="981" height="925" alt="image" src="https://github.com/user-attachments/assets/38e657f8-5e2b-44e3-b37c-3eeb3ee6c6f9" />
+
+<img width="775" height="929" alt="image" src="https://github.com/user-attachments/assets/7b61acd1-6626-4d7f-9ee8-b85038a353fa" />
+
+<img width="909" height="444" alt="image" src="https://github.com/user-attachments/assets/872d5a3c-b732-4eff-ab13-1adf712955ee" />
+
+<img width="886" height="228" alt="image" src="https://github.com/user-attachments/assets/881ce3d0-2c1a-4a65-a001-733acba10f1b" />
+
+<img width="909" height="515" alt="image" src="https://github.com/user-attachments/assets/87ea1fbc-14c5-407b-83ba-f911451a83ea" />
+
+<img width="428" height="145" alt="image" src="https://github.com/user-attachments/assets/15fe0e7d-4b53-4fd6-a5dc-e172f877a1a9" />
+
